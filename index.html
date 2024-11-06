@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-gray-100">
-    <!-- Home/Landing Page -->
+    <!-- Home/Landing Page/Dashboard -->
     <div
       id="home-page"
       class="flex flex-col items-center justify-center h-screen"
@@ -22,38 +22,70 @@
       </button>
     </div>
 
-    <!-- Form Data Pemain -->
+    <!-- Landing Page -->
     <div
-      id="player-form"
-      class="hidden flex flex-col items-center justify-center h-screen"
+      id="landing-page"
+      class="hidden flex flex-col items-center justify-center h-screen p-4"
     >
-      <h2 class="text-2xl font-semibold mb-4">Masukkan Data Pemain</h2>
-      <form id="form" class="bg-white p-6 rounded-lg shadow-md">
-        <div class="mb-4">
-          <label class="block text-gray-700">Nama:</label>
-          <input
-            type="text"
-            id="name"
-            class="mt-1 p-2 border rounded w-64"
-            required
-          />
-        </div>
-        <div class="mb-4">
-          <label class="block text-gray-700">NIM:</label>
-          <input
-            type="text"
-            id="nim"
-            class="mt-1 p-2 border rounded w-64"
-            required
-          />
-        </div>
+      <div class="bg-white p-8 rounded-lg shadow-md max-w-lg text-center">
+        <h2 class="text-2xl font-semibold mb-4">Instruksi Quiz</h2>
+        <p class="mb-6">
+          Selamat datang! Silakan ikuti instruksi berikut sebelum memulai quiz:
+        </p>
+        <ul class="list-disc list-inside text-left mb-6">
+          <li>Quiz terdiri dari 10 pertanyaan dengan berbagai tipe soal.</li>
+          <li>Setiap pertanyaan memiliki waktu 30 detik.</li>
+          <li>Jawaban akan dinilai secara otomatis.</li>
+          <li>
+            Pastikan Anda telah memasukkan data diri dengan benar sebelum
+            memulai.
+          </li>
+        </ul>
         <button
-          type="submit"
+          id="to-dashboard-button"
           class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
         >
-          Mulai Quiz
+          Lanjut ke Dashboard
         </button>
-      </form>
+      </div>
+    </div>
+
+    <!-- Dashboard (Form Data Pemain) -->
+    <div
+      id="dashboard"
+      class="hidden flex flex-col items-center justify-center h-screen p-4"
+    >
+      <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+        <h2 class="text-2xl font-semibold mb-6 text-center">
+          Masukkan Data Pemain
+        </h2>
+        <form id="form" class="space-y-4">
+          <div>
+            <label for="name" class="block text-gray-700">Nama:</label>
+            <input
+              type="text"
+              id="name"
+              class="mt-1 p-2 border rounded w-full"
+              required
+            />
+          </div>
+          <div>
+            <label for="nim" class="block text-gray-700">NIM:</label>
+            <input
+              type="text"
+              id="nim"
+              class="mt-1 p-2 border rounded w-full"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
+            Mulai Quiz
+          </button>
+        </form>
+      </div>
     </div>
 
     <!-- Halaman Quiz -->
@@ -105,10 +137,6 @@
           <p><strong>Nama:</strong> <span id="result-name"></span></p>
           <p><strong>NIM:</strong> <span id="result-nim"></span></p>
           <p><strong>Nilai Total:</strong> <span id="result-score"></span></p>
-          <p>
-            <strong>Nilai Rata-rata (Asprak):</strong>
-            <span id="result-average"></span>
-          </p>
           <p id="extra-info" class="mt-2 text-sm text-gray-700 hidden">
             Anda dapat menyimpan poin lebih dari 100 untuk memperbaiki nilai di
             modul lain.
@@ -145,6 +173,391 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="src/js/script.js"></script>
+    <script>
+      // Data Quiz
+      const quizData = [
+        {
+          question: "Apa ibu kota Indonesia?",
+          type: "multiple",
+          options: ["Jakarta", "Bandung", "Surabaya", "Medan"],
+          answer: "Jakarta",
+          points: 10,
+        },
+        {
+          question: "2 + 2 = ?",
+          type: "fill",
+          answer: "4",
+          points: 5,
+        },
+        {
+          question: "Siapa penemu lampu pijar?",
+          type: "multiple",
+          options: [
+            "Thomas Edison",
+            "Albert Einstein",
+            "Isaac Newton",
+            "Nikola Tesla",
+          ],
+          answer: "Thomas Edison",
+          points: 10,
+        },
+        {
+          question: "Apa singkatan dari HTML?",
+          type: "fill",
+          answer: "HyperText Markup Language",
+          points: 5,
+        },
+        {
+          question: "Berapakah luas Indonesia?",
+          type: "fill",
+          answer: "1.904.569 km²",
+          points: 10,
+        },
+        {
+          question: "Manakah yang merupakan bahasa pemrograman?",
+          type: "multiple",
+          options: ["HTML", "CSS", "JavaScript", "HTTP"],
+          answer: "JavaScript",
+          points: 10,
+        },
+        {
+          question: "Apa singkatan dari CSS?",
+          type: "fill",
+          answer: "Cascading Style Sheets",
+          points: 5,
+        },
+        {
+          question: "Manakah yang bukan merupakan framework JavaScript?",
+          type: "multiple",
+          options: ["React", "Angular", "Laravel", "Vue"],
+          answer: "Laravel",
+          points: 10,
+        },
+        {
+          question:
+            "Berapakah nilai maksimal yang bisa didapatkan dalam quiz ini?",
+          type: "fill",
+          answer: "150",
+          points: 10,
+        },
+        {
+          question: "Apa fungsi dari Git dalam pengembangan perangkat lunak?",
+          type: "fill",
+          answer: "Version Control",
+          points: 10,
+        },
+      ];
+
+      // State Quiz: Menyimpan status setiap pertanyaan
+      let quizState = quizData.map(() => ({
+        answered: false,
+        answer: "",
+        timeLeft: 30,
+        locked: false,
+      }));
+
+      let currentQuestion = 0;
+      let score = 0;
+      let timer = null;
+
+      // Element References
+      const homePage = document.getElementById("home-page");
+      const startButton = document.getElementById("start-button");
+      const landingPage = document.getElementById("landing-page");
+      const toDashboardButton = document.getElementById("to-dashboard-button");
+      const dashboard = document.getElementById("dashboard");
+      const form = document.getElementById("form");
+      const quizPage = document.getElementById("quiz-page");
+      const questionContainer = document.getElementById("question-container");
+      const optionsContainer = document.getElementById("options-container");
+      const prevButton = document.getElementById("prev-button");
+      const nextButton = document.getElementById("next-button");
+      const timerElement = document.getElementById("timer");
+      const progressElement = document.getElementById("progress");
+      const statusElement = document.getElementById("status");
+      const resultPage = document.getElementById("result-page");
+      const resultName = document.getElementById("result-name");
+      const resultNim = document.getElementById("result-nim");
+      const resultScore = document.getElementById("result-score");
+      const extraInfo = document.getElementById("extra-info");
+      const reviewTableBody = document.getElementById("review-table-body");
+      const restartButton = document.getElementById("restart-button");
+
+      // Data Pemain
+      let player = {
+        name: "",
+        nim: "",
+      };
+
+      // Event Listeners
+      startButton.addEventListener("click", () => {
+        homePage.classList.add("hidden");
+        landingPage.classList.remove("hidden");
+      });
+
+      toDashboardButton.addEventListener("click", () => {
+        landingPage.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+      });
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        player.name = document.getElementById("name").value.trim();
+        player.nim = document.getElementById("nim").value.trim();
+        if (player.name && player.nim) {
+          dashboard.classList.add("hidden");
+          quizPage.classList.remove("hidden");
+          loadQuestion();
+          startTimer();
+          updateProgress();
+          updateStatus();
+        } else {
+          alert("Harap masukkan semua data.");
+        }
+      });
+
+      prevButton.addEventListener("click", () => {
+        saveAnswer();
+        if (currentQuestion > 0) {
+          const prevQuestionState = quizState[currentQuestion - 1];
+          if (!prevQuestionState.locked) {
+            currentQuestion--;
+            loadQuestion();
+            resetTimer();
+            updateProgress();
+          }
+        }
+      });
+
+      nextButton.addEventListener("click", () => {
+        saveAnswer();
+        if (currentQuestion < quizData.length - 1) {
+          currentQuestion++;
+          loadQuestion();
+          resetTimer();
+          updateProgress();
+        } else {
+          endQuiz();
+        }
+      });
+
+      restartButton.addEventListener("click", () => {
+        // Reset state
+        currentQuestion = 0;
+        score = 0;
+        quizState = quizData.map(() => ({
+          answered: false,
+          answer: "",
+          timeLeft: 30,
+          locked: false,
+        }));
+        clearInterval(timer);
+        quizPage.classList.add("hidden");
+        resultPage.classList.add("hidden");
+        reviewTableBody.innerHTML = "";
+        homePage.classList.remove("hidden");
+      });
+
+      // Functions
+      function loadQuestion() {
+        const data = quizData[currentQuestion];
+        const state = quizState[currentQuestion];
+        questionContainer.innerHTML = `<h3 class="text-xl font-semibold mb-2">Soal ${
+          currentQuestion + 1
+        }: ${data.question}</h3>`;
+        optionsContainer.innerHTML = "";
+
+        if (data.type === "multiple") {
+          data.options.forEach((option) => {
+            const optionElement = document.createElement("div");
+            optionElement.classList.add("mb-2");
+            optionElement.innerHTML = `
+            <label class="flex items-center">
+              <input type="radio" name="option" value="${option}" class="mr-2">
+              ${option}
+            </label>
+          `;
+            optionsContainer.appendChild(optionElement);
+          });
+        } else if (data.type === "fill") {
+          optionsContainer.innerHTML = `<input type="text" id="fill-answer" class="mt-1 p-2 border rounded w-full" placeholder="Jawaban Anda">`;
+        }
+
+        // Load previous answer if exists
+        if (quizState[currentQuestion].answer !== "") {
+          if (data.type === "multiple") {
+            const radios = document.getElementsByName("option");
+            radios.forEach((radio) => {
+              if (radio.value === quizState[currentQuestion].answer) {
+                radio.checked = true;
+              }
+            });
+          } else if (data.type === "fill") {
+            document.getElementById("fill-answer").value =
+              quizState[currentQuestion].answer;
+          }
+        }
+
+        // Update timer display
+        timerElement.textContent = `${quizState[currentQuestion].timeLeft}s`;
+
+        // Disable 'prev' button if current question is locked or first question
+        if (
+          currentQuestion === 0 ||
+          (currentQuestion > 0 && quizState[currentQuestion - 1].locked)
+        ) {
+          prevButton.disabled = true;
+          prevButton.classList.add("opacity-50", "cursor-not-allowed");
+        } else {
+          const prevQuestionState = quizState[currentQuestion - 1];
+          prevButton.disabled = prevQuestionState.locked;
+          if (prevQuestionState.locked) {
+            prevButton.classList.add("opacity-50", "cursor-not-allowed");
+          } else {
+            prevButton.classList.remove("opacity-50", "cursor-not-allowed");
+          }
+        }
+
+        // Disable 'next' button if current question is locked
+        if (quizState[currentQuestion].locked) {
+          nextButton.disabled = true;
+          nextButton.classList.add("opacity-50", "cursor-not-allowed");
+        } else {
+          nextButton.disabled = false;
+          nextButton.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+      }
+
+      function saveAnswer() {
+        const data = quizData[currentQuestion];
+        const state = quizState[currentQuestion];
+        let answer = "";
+
+        if (data.type === "multiple") {
+          const selected = document.querySelector(
+            'input[name="option"]:checked'
+          );
+          answer = selected ? selected.value : "";
+        } else if (data.type === "fill") {
+          const fillAnswer = document
+            .getElementById("fill-answer")
+            .value.trim();
+          answer = fillAnswer;
+        }
+
+        if (answer !== "") {
+          state.answered = true;
+          state.answer = answer;
+        } else {
+          state.answered = false;
+          state.answer = "";
+        }
+
+        updateStatus();
+      }
+
+      function startTimer() {
+        clearInterval(timer);
+        const state = quizState[currentQuestion];
+        if (state.locked) return; // Tidak perlu memulai timer jika sudah terkunci
+
+        timer = setInterval(() => {
+          if (state.timeLeft > 0) {
+            state.timeLeft--;
+            timerElement.textContent = `${state.timeLeft}s`;
+
+            if (state.timeLeft === 0) {
+              clearInterval(timer);
+              state.locked = true;
+              // Auto-navigate to next question jika masih ada
+              if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+                startTimer();
+                updateProgress();
+              } else {
+                endQuiz();
+              }
+            }
+          }
+        }, 1000);
+      }
+
+      function resetTimer() {
+        clearInterval(timer);
+        startTimer();
+      }
+
+      function updateProgress() {
+        progressElement.textContent = `Soal ${currentQuestion + 1} / ${
+          quizData.length
+        }`;
+      }
+
+      function updateStatus() {
+        const completed = quizState.filter((q) => q.answered).length;
+        statusElement.textContent = `Soal sudah dikerjakan: ${completed} / ${quizData.length}`;
+      }
+
+      function endQuiz() {
+        clearInterval(timer);
+        saveAnswer();
+        calculateScore();
+        quizPage.classList.add("hidden");
+        resultPage.classList.remove("hidden");
+      }
+
+      function calculateScore() {
+        score = 0;
+        reviewTableBody.innerHTML = ""; // Clear previous review if any
+        quizData.forEach((item, index) => {
+          const state = quizState[index];
+          const userAnswer =
+            state.answer !== "" ? state.answer : "Tidak Dijawab";
+          const correctAnswer = item.answer;
+          let isCorrect = false;
+
+          if (item.type === "multiple") {
+            if (userAnswer === correctAnswer) {
+              score += item.points;
+              isCorrect = true;
+            }
+          } else if (item.type === "fill") {
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+              score += item.points;
+              isCorrect = true;
+            }
+          }
+
+          // Tambahkan baris ke tabel review
+          const row = document.createElement("tr");
+          row.classList.add("text-center");
+          row.innerHTML = `
+          <td class="px-4 py-2 border">${index + 1}</td>
+          <td class="px-4 py-2 border">${item.question}</td>
+          <td class="px-4 py-2 border">${userAnswer}</td>
+          <td class="px-4 py-2 border">${correctAnswer}</td>
+          <td class="px-4 py-2 border ${
+            isCorrect ? "text-green-600" : "text-red-600"
+          } font-semibold">
+            ${isCorrect ? "Benar" : "Salah"}
+          </td>
+        `;
+          reviewTableBody.appendChild(row);
+        });
+
+        // Menampilkan Hasil
+        resultName.textContent = player.name;
+        resultNim.textContent = player.nim;
+        resultScore.textContent = score;
+
+        // Menentukan apakah poin melebihi 100
+        if (score > 100) {
+          extraInfo.classList.remove("hidden");
+        } else {
+          extraInfo.classList.add("hidden");
+        }
+      }
+    </script>
   </body>
 </html>
