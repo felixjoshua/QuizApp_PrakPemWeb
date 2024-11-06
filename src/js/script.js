@@ -86,7 +86,9 @@ let timer = null;
 // Element References
 const homePage = document.getElementById("home-page");
 const startButton = document.getElementById("start-button");
-const playerForm = document.getElementById("player-form");
+const landingPage = document.getElementById("landing-page");
+const toDashboardButton = document.getElementById("to-dashboard-button");
+const dashboard = document.getElementById("dashboard");
 const form = document.getElementById("form");
 const quizPage = document.getElementById("quiz-page");
 const questionContainer = document.getElementById("question-container");
@@ -100,10 +102,9 @@ const resultPage = document.getElementById("result-page");
 const resultName = document.getElementById("result-name");
 const resultNim = document.getElementById("result-nim");
 const resultScore = document.getElementById("result-score");
-const resultAverage = document.getElementById("result-average");
 const extraInfo = document.getElementById("extra-info");
-const restartButton = document.getElementById("restart-button");
 const reviewTableBody = document.getElementById("review-table-body");
+const restartButton = document.getElementById("restart-button");
 
 // Data Pemain
 let player = {
@@ -114,7 +115,12 @@ let player = {
 // Event Listeners
 startButton.addEventListener("click", () => {
   homePage.classList.add("hidden");
-  playerForm.classList.remove("hidden");
+  landingPage.classList.remove("hidden");
+});
+
+toDashboardButton.addEventListener("click", () => {
+  landingPage.classList.add("hidden");
+  dashboard.classList.remove("hidden");
 });
 
 form.addEventListener("submit", (e) => {
@@ -122,7 +128,7 @@ form.addEventListener("submit", (e) => {
   player.name = document.getElementById("name").value.trim();
   player.nim = document.getElementById("nim").value.trim();
   if (player.name && player.nim) {
-    playerForm.classList.add("hidden");
+    dashboard.classList.add("hidden");
     quizPage.classList.remove("hidden");
     loadQuestion();
     startTimer();
@@ -201,21 +207,22 @@ function loadQuestion() {
   }
 
   // Load previous answer if exists
-  if (state.answer !== "") {
+  if (quizState[currentQuestion].answer !== "") {
     if (data.type === "multiple") {
       const radios = document.getElementsByName("option");
       radios.forEach((radio) => {
-        if (radio.value === state.answer) {
+        if (radio.value === quizState[currentQuestion].answer) {
           radio.checked = true;
         }
       });
     } else if (data.type === "fill") {
-      document.getElementById("fill-answer").value = state.answer;
+      document.getElementById("fill-answer").value =
+        quizState[currentQuestion].answer;
     }
   }
 
   // Update timer display
-  timerElement.textContent = `${state.timeLeft}s`;
+  timerElement.textContent = `${quizState[currentQuestion].timeLeft}s`;
 
   // Disable 'prev' button if current question is locked or first question
   if (
@@ -235,7 +242,7 @@ function loadQuestion() {
   }
 
   // Disable 'next' button if current question is locked
-  if (state.locked) {
+  if (quizState[currentQuestion].locked) {
     nextButton.disabled = true;
     nextButton.classList.add("opacity-50", "cursor-not-allowed");
   } else {
@@ -357,12 +364,6 @@ function calculateScore() {
     reviewTableBody.appendChild(row);
   });
 
-  // Simulasi Rata-rata Nilai dari 3 Asprak
-  const asprakScores = generateAsprakScores(score);
-  const averageScore = (
-    asprakScores.reduce((a, b) => a + b, 0) / asprakScores.length
-  ).toFixed(2);
-
   // Menampilkan Hasil
   resultName.textContent = player.name;
   resultNim.textContent = player.nim;
@@ -374,19 +375,4 @@ function calculateScore() {
   } else {
     extraInfo.classList.add("hidden");
   }
-
-  resultAverage.textContent = averageScore;
-}
-
-function generateAsprakScores(totalScore) {
-  // Menghasilkan tiga skor acak dari asprak yang berkisar antara totalScore -5 hingga totalScore +5
-  // Pastikan skor tetap dalam rentang 0 hingga 150
-  let scores = [];
-  for (let i = 0; i < 3; i++) {
-    let variation = Math.floor(Math.random() * 11) - 5; // -5 to +5
-    let asprakScore = totalScore + variation;
-    asprakScore = Math.max(0, Math.min(asprakScore, 150));
-    scores.push(asprakScore);
-  }
-  return scores;
 }
