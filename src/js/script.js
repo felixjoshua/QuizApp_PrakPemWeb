@@ -71,12 +71,17 @@ const quizData = [
   },
 ];
 
-// State Quiz
+// State Quiz: Menyimpan status setiap pertanyaan
+let quizState = quizData.map(() => ({
+  answered: false,
+  answer: "",
+  timeLeft: 30,
+  locked: false,
+}));
+
 let currentQuestion = 0;
 let score = 0;
-let timer;
-let timeLeft = 30;
-let answers = [];
+let timer = null;
 
 // Element References
 const homePage = document.getElementById("home-page");
@@ -98,6 +103,7 @@ const resultScore = document.getElementById("result-score");
 const resultAverage = document.getElementById("result-average");
 const extraInfo = document.getElementById("extra-info");
 const restartButton = document.getElementById("restart-button");
+const reviewTableBody = document.getElementById("review-table-body");
 
 // Data Pemain
 let player = {
@@ -130,10 +136,13 @@ form.addEventListener("submit", (e) => {
 prevButton.addEventListener("click", () => {
   saveAnswer();
   if (currentQuestion > 0) {
-    currentQuestion--;
-    loadQuestion();
-    resetTimer();
-    updateProgress();
+    const prevQuestionState = quizState[currentQuestion - 1];
+    if (!prevQuestionState.locked) {
+      currentQuestion--;
+      loadQuestion();
+      resetTimer();
+      updateProgress();
+    }
   }
 });
 
@@ -153,15 +162,23 @@ restartButton.addEventListener("click", () => {
   // Reset state
   currentQuestion = 0;
   score = 0;
-  answers = [];
+  quizState = quizData.map(() => ({
+    answered: false,
+    answer: "",
+    timeLeft: 30,
+    locked: false,
+  }));
+  clearInterval(timer);
   quizPage.classList.add("hidden");
   resultPage.classList.add("hidden");
+  reviewTableBody.innerHTML = "";
   homePage.classList.remove("hidden");
 });
 
 // Functions
 function loadQuestion() {
   const data = quizData[currentQuestion];
+  const state = quizState[currentQuestion];
   questionContainer.innerHTML = `<h3 class="text-xl font-semibold mb-2">Soal ${
     currentQuestion + 1
   }: ${data.question}</h3>`;
@@ -172,11 +189,11 @@ function loadQuestion() {
       const optionElement = document.createElement("div");
       optionElement.classList.add("mb-2");
       optionElement.innerHTML = `
-        <label class="flex items-center">
-          <input type="radio" name="option" value="${option}" class="mr-2">
-          ${option}
-        </label>
-      `;
+      <label class="flex items-center">
+        <input type="radio" name="option" value="${option}" class="mr-2">
+        ${option}
+      </label>
+    `;
       optionsContainer.appendChild(optionElement);
     });
   } else if (data.type === "fill") {
@@ -184,49 +201,95 @@ function loadQuestion() {
   }
 
   // Load previous answer if exists
-  if (answers[currentQuestion] !== undefined) {
+  if (state.answer !== "") {
     if (data.type === "multiple") {
       const radios = document.getElementsByName("option");
       radios.forEach((radio) => {
-        if (radio.value === answers[currentQuestion]) {
+        if (radio.value === state.answer) {
           radio.checked = true;
         }
       });
     } else if (data.type === "fill") {
-      document.getElementById("fill-answer").value = answers[currentQuestion];
+      document.getElementById("fill-answer").value = state.answer;
     }
+  }
+
+  // Update timer display
+  timerElement.textContent = `${state.timeLeft}s`;
+
+  // Disable 'prev' button if current question is locked or first question
+  if (
+    currentQuestion === 0 ||
+    (currentQuestion > 0 && quizState[currentQuestion - 1].locked)
+  ) {
+    prevButton.disabled = true;
+    prevButton.classList.add("opacity-50", "cursor-not-allowed");
+  } else {
+    const prevQuestionState = quizState[currentQuestion - 1];
+    prevButton.disabled = prevQuestionState.locked;
+    if (prevQuestionState.locked) {
+      prevButton.classList.add("opacity-50", "cursor-not-allowed");
+    } else {
+      prevButton.classList.remove("opacity-50", "cursor-not-allowed");
+    }
+  }
+
+  // Disable 'next' button if current question is locked
+  if (state.locked) {
+    nextButton.disabled = true;
+    nextButton.classList.add("opacity-50", "cursor-not-allowed");
+  } else {
+    nextButton.disabled = false;
+    nextButton.classList.remove("opacity-50", "cursor-not-allowed");
   }
 }
 
 function saveAnswer() {
   const data = quizData[currentQuestion];
-  let answer;
+  const state = quizState[currentQuestion];
+  let answer = "";
+
   if (data.type === "multiple") {
     const selected = document.querySelector('input[name="option"]:checked');
     answer = selected ? selected.value : "";
   } else if (data.type === "fill") {
-    answer = document.getElementById("fill-answer").value.trim();
+    const fillAnswer = document.getElementById("fill-answer").value.trim();
+    answer = fillAnswer;
   }
-  answers[currentQuestion] = answer;
+
+  if (answer !== "") {
+    state.answered = true;
+    state.answer = answer;
+  } else {
+    state.answered = false;
+    state.answer = "";
+  }
+
   updateStatus();
 }
 
 function startTimer() {
-  timeLeft = 30;
-  timerElement.textContent = `${timeLeft}s`;
+  clearInterval(timer);
+  const state = quizState[currentQuestion];
+  if (state.locked) return; // Tidak perlu memulai timer jika sudah terkunci
+
   timer = setInterval(() => {
-    timeLeft--;
-    timerElement.textContent = `${timeLeft}s`;
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      saveAnswer();
-      if (currentQuestion < quizData.length - 1) {
-        currentQuestion++;
-        loadQuestion();
-        resetTimer();
-        updateProgress();
-      } else {
-        endQuiz();
+    if (state.timeLeft > 0) {
+      state.timeLeft--;
+      timerElement.textContent = `${state.timeLeft}s`;
+
+      if (state.timeLeft === 0) {
+        clearInterval(timer);
+        state.locked = true;
+        // Auto-navigate to next question jika masih ada
+        if (currentQuestion < quizData.length - 1) {
+          currentQuestion++;
+          loadQuestion();
+          startTimer();
+          updateProgress();
+        } else {
+          endQuiz();
+        }
       }
     }
   }, 1000);
@@ -244,9 +307,7 @@ function updateProgress() {
 }
 
 function updateStatus() {
-  const completed = answers.filter(
-    (ans) => ans !== undefined && ans !== ""
-  ).length;
+  const completed = quizState.filter((q) => q.answered).length;
   statusElement.textContent = `Soal sudah dikerjakan: ${completed} / ${quizData.length}`;
 }
 
@@ -260,18 +321,40 @@ function endQuiz() {
 
 function calculateScore() {
   score = 0;
+  reviewTableBody.innerHTML = ""; // Clear previous review if any
   quizData.forEach((item, index) => {
-    if (answers[index]) {
-      if (item.type === "multiple") {
-        if (answers[index] === item.answer) {
-          score += item.points;
-        }
-      } else if (item.type === "fill") {
-        if (answers[index].toLowerCase() === item.answer.toLowerCase()) {
-          score += item.points;
-        }
+    const state = quizState[index];
+    const userAnswer = state.answer !== "" ? state.answer : "Tidak Dijawab";
+    const correctAnswer = item.answer;
+    let isCorrect = false;
+
+    if (item.type === "multiple") {
+      if (userAnswer === correctAnswer) {
+        score += item.points;
+        isCorrect = true;
+      }
+    } else if (item.type === "fill") {
+      if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+        score += item.points;
+        isCorrect = true;
       }
     }
+
+    // Tambahkan baris ke tabel review
+    const row = document.createElement("tr");
+    row.classList.add("text-center");
+    row.innerHTML = `
+    <td class="px-4 py-2 border">${index + 1}</td>
+    <td class="px-4 py-2 border">${item.question}</td>
+    <td class="px-4 py-2 border">${userAnswer}</td>
+    <td class="px-4 py-2 border">${correctAnswer}</td>
+    <td class="px-4 py-2 border ${
+      isCorrect ? "text-green-600" : "text-red-600"
+    } font-semibold">
+      ${isCorrect ? "Benar" : "Salah"}
+    </td>
+  `;
+    reviewTableBody.appendChild(row);
   });
 
   // Simulasi Rata-rata Nilai dari 3 Asprak
@@ -288,6 +371,8 @@ function calculateScore() {
   // Menentukan apakah poin melebihi 100
   if (score > 100) {
     extraInfo.classList.remove("hidden");
+  } else {
+    extraInfo.classList.add("hidden");
   }
 
   resultAverage.textContent = averageScore;

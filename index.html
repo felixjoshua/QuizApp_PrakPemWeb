@@ -97,21 +97,44 @@
     <!-- Halaman Hasil -->
     <div
       id="result-page"
-      class="hidden flex flex-col items-center justify-center h-screen"
+      class="hidden flex flex-col items-center justify-center min-h-screen p-4"
     >
       <h2 class="text-3xl font-semibold mb-6">Hasil Quiz</h2>
-      <div class="bg-white p-6 rounded-lg shadow-md w-80">
-        <p><strong>Nama:</strong> <span id="result-name"></span></p>
-        <p><strong>NIM:</strong> <span id="result-nim"></span></p>
-        <p><strong>Nilai Total:</strong> <span id="result-score"></span></p>
-        <p>
-          <strong>Nilai Rata-rata (Asprak):</strong>
-          <span id="result-average"></span>
-        </p>
-        <p id="extra-info" class="mt-2 text-sm text-gray-700 hidden">
-          Anda dapat menyimpan poin lebih dari 100 untuk memperbaiki nilai di
-          modul lain.
-        </p>
+      <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
+        <div class="mb-4">
+          <p><strong>Nama:</strong> <span id="result-name"></span></p>
+          <p><strong>NIM:</strong> <span id="result-nim"></span></p>
+          <p><strong>Nilai Total:</strong> <span id="result-score"></span></p>
+          <p>
+            <strong>Nilai Rata-rata (Asprak):</strong>
+            <span id="result-average"></span>
+          </p>
+          <p id="extra-info" class="mt-2 text-sm text-gray-700 hidden">
+            Anda dapat menyimpan poin lebih dari 100 untuk memperbaiki nilai di
+            modul lain.
+          </p>
+        </div>
+        <!-- Review Jawaban -->
+        <div id="review-section" class="mt-6">
+          <h3 class="text-2xl font-semibold mb-4">Review Jawaban</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full bg-white">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2 border">No</th>
+                  <th class="px-4 py-2 border">Pertanyaan</th>
+                  <th class="px-4 py-2 border">Jawaban Anda</th>
+                  <th class="px-4 py-2 border">Jawaban Benar</th>
+                  <th class="px-4 py-2 border">Status</th>
+                </tr>
+              </thead>
+              <tbody id="review-table-body">
+                <!-- Baris jawaban akan dimasukkan di sini -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Akhir Review Jawaban -->
       </div>
       <button
         id="restart-button"
