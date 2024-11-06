@@ -369,10 +369,10 @@ function calculateScore() {
   resultNim.textContent = player.nim;
   resultScore.textContent = score;
 
-  // Menentukan apakah poin melebihi 100
-  if (score > 100) {
-    extraInfo.classList.remove("hidden");
-  } else {
-    extraInfo.classList.add("hidden");
-  }
+  // // Menentukan apakah poin melebihi 100
+  // if (score > 100) {
+  //   extraInfo.classList.remove("hidden");
+  // } else {
+  //   extraInfo.classList.add("hidden");
+  // }
 }
