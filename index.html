@@ -1,434 +1,368 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz App</title>
-    <!-- Tailwind CSS CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        /* Custom styles can be added here if needed */
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aplikasi Quiz</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
 
-    <!-- Home/Landing Page -->
-    <div id="home" class="min-h-screen flex flex-col items-center justify-center">
-        <h1 class="text-4xl font-bold mb-8">Selamat Datang di Quiz App</h1>
-        <button id="startBtn" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">Mulai Quiz</button>
+  <!-- Home/Landing Page -->
+  <div id="home-page" class="flex flex-col items-center justify-center h-screen">
+    <h1 class="text-4xl font-bold mb-6">Selamat Datang di Aplikasi Quiz</h1>
+    <button id="start-button" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Mulai Quiz</button>
+  </div>
+
+  <!-- Form Data Pemain -->
+  <div id="player-form" class="hidden flex flex-col items-center justify-center h-screen">
+    <h2 class="text-2xl font-semibold mb-4">Masukkan Data Pemain</h2>
+    <form id="form" class="bg-white p-6 rounded-lg shadow-md">
+      <div class="mb-4">
+        <label class="block text-gray-700">Nama:</label>
+        <input type="text" id="name" class="mt-1 p-2 border rounded w-64" required>
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700">NIM:</label>
+        <input type="text" id="nim" class="mt-1 p-2 border rounded w-64" required>
+      </div>
+      <button type="submit" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600">Mulai Quiz</button>
+    </form>
+  </div>
+
+  <!-- Halaman Quiz -->
+  <div id="quiz-page" class="hidden flex flex-col items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md">
+      <div class="flex justify-between mb-4">
+        <div id="timer" class="text-lg font-semibold">30s</div>
+        <div id="progress" class="text-lg font-semibold">Soal 1 / 10</div>
+      </div>
+      <div id="question-container" class="mb-4">
+        <!-- Pertanyaan akan dimasukkan di sini -->
+      </div>
+      <div id="options-container" class="mb-4">
+        <!-- Opsi jawaban akan dimasukkan di sini -->
+      </div>
+      <div class="flex justify-between">
+        <button id="prev-button" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">Sebelumnya</button>
+        <button id="next-button" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Berikutnya</button>
+      </div>
+      <div class="mt-4">
+        <span id="status" class="text-sm text-gray-600">Soal sudah dikerjakan: 0 / 10</span>
+      </div>
     </div>
+  </div>
 
-    <!-- Player Data Input Page -->
-    <div id="player-data" class="min-h-screen flex flex-col items-center justify-center hidden">
-        <h2 class="text-2xl font-semibold mb-6">Masukkan Data Pemain</h2>
-        <form id="playerForm" class="w-full max-w-sm">
-            <div class="mb-4">
-                <label class="block text-gray-700">Nama:</label>
-                <input type="text" id="name" class="w-full px-3 py-2 border rounded-lg" required>
-            </div>
-            <div class="mb-6">
-                <label class="block text-gray-700">NIM:</label>
-                <input type="text" id="nim" class="w-full px-3 py-2 border rounded-lg" required>
-            </div>
-            <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">Lanjut</button>
-        </form>
+  <!-- Halaman Hasil -->
+  <div id="result-page" class="hidden flex flex-col items-center justify-center h-screen">
+    <h2 class="text-3xl font-semibold mb-6">Hasil Quiz</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md w-80">
+      <p><strong>Nama:</strong> <span id="result-name"></span></p>
+      <p><strong>NIM:</strong> <span id="result-nim"></span></p>
+      <p><strong>Nilai Total:</strong> <span id="result-score"></span></p>
+      <p><strong>Nilai Rata-rata (Asprak):</strong> <span id="result-average"></span></p>
+      <p id="extra-info" class="mt-2 text-sm text-gray-700 hidden">Anda dapat menyimpan poin lebih dari 100 untuk memperbaiki nilai di modul lain.</p>
     </div>
+    <button id="restart-button" class="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Ulangi Quiz</button>
+  </div>
 
-    <!-- Quiz Page -->
-    <div id="quiz-page" class="min-h-screen flex flex-col items-center justify-center hidden">
-        <div class="w-full max-w-3xl p-6 bg-white rounded-lg shadow-lg">
-            <div class="flex justify-between mb-4">
-                <div id="question-status" class="text-gray-700">Soal 1 dari 10</div>
-                <div id="timer" class="text-red-500">30s</div>
-            </div>
-            <div id="question-container">
-                <h3 id="question" class="text-xl font-semibold mb-4">Pertanyaan akan muncul di sini</h3>
-                <div id="options" class="space-y-2">
-                    <!-- Options will be dynamically generated here -->
-                </div>
-            </div>
-            <div class="flex justify-between mt-6">
-                <button id="prevBtn" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600" disabled>Previous</button>
-                <button id="nextBtn" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Next</button>
-            </div>
-            <div class="mt-4 text-gray-700">
-                Soal Selesai: <span id="completed">0</span> / <span id="total-questions">0</span>
-            </div>
-            <div class="mt-2 text-gray-700">
-                Total Nilai: <span id="current-score">0</span> / <span id="max-score">0</span>
-            </div>
-        </div>
-    </div>
+  <!-- JavaScript -->
+  <script>
+    // Data Quiz
+    const quizData = [
+      {
+        question: "Apa ibu kota Indonesia?",
+        type: "multiple",
+        options: ["Jakarta", "Bandung", "Surabaya", "Medan"],
+        answer: "Jakarta",
+        points: 10
+      },
+      {
+        question: "2 + 2 = ?",
+        type: "fill",
+        answer: "4",
+        points: 5
+      },
+      {
+        question: "Siapa penemu lampu pijar?",
+        type: "multiple",
+        options: ["Thomas Edison", "Albert Einstein", "Isaac Newton", "Nikola Tesla"],
+        answer: "Thomas Edison",
+        points: 10
+      },
+      {
+        question: "Apa singkatan dari HTML?",
+        type: "fill",
+        answer: "HyperText Markup Language",
+        points: 5
+      },
+      {
+        question: "Berapakah luas Indonesia?",
+        type: "fill",
+        answer: "1.904.569 km²",
+        points: 10
+      },
+      {
+        question: "Manakah yang merupakan bahasa pemrograman?",
+        type: "multiple",
+        options: ["HTML", "CSS", "JavaScript", "HTTP"],
+        answer: "JavaScript",
+        points: 10
+      },
+      {
+        question: "Apa singkatan dari CSS?",
+        type: "fill",
+        answer: "Cascading Style Sheets",
+        points: 5
+      },
+      {
+        question: "Manakah yang bukan merupakan framework JavaScript?",
+        type: "multiple",
+        options: ["React", "Angular", "Laravel", "Vue"],
+        answer: "Laravel",
+        points: 10
+      },
+      {
+        question: "Berapakah nilai maksimal yang bisa didapatkan dalam quiz ini?",
+        type: "fill",
+        answer: "150",
+        points: 10
+      },
+      {
+        question: "Apa fungsi dari Git dalam pengembangan perangkat lunak?",
+        type: "fill",
+        answer: "Version Control",
+        points: 10
+      }
+    ];
 
-    <!-- Result Page -->
-    <div id="result-page" class="min-h-screen flex flex-col items-center justify-center hidden">
-        <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg text-center">
-            <h2 class="text-3xl font-bold mb-4">Hasil Quiz</h2>
-            <p class="mb-2">Nama: <span id="result-name"></span></p>
-            <p class="mb-2">NIM: <span id="result-nim"></span></p>
-            <p class="mb-4">Total Nilai: <span id="result-score"></span></p>
-            <button id="restartBtn" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">Ulangi Quiz</button>
-        </div>
-    </div>
+    // State Quiz
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 30;
+    let answers = [];
 
-    <!-- JavaScript -->
-    <script>
-        // Sample Questions Array
-        const questions = [
-            {
-                type: 'multiple', // 'multiple' or 'text'
-                question: 'Apa ibu kota Indonesia?',
-                options: ['Jakarta', 'Bandung', 'Surabaya', 'Medan'],
-                answer: 'Jakarta',
-                point: 10
-            },
-            {
-                type: 'text',
-                question: 'Sebutkan planet terdekat dengan matahari.',
-                answer: 'Merkurius',
-                point: 10
-            },
-            {
-                type: 'multiple',
-                question: 'Berapa jumlah provinsi di Indonesia?',
-                options: ['34', '35', '36', '33'],
-                answer: '34',
-                point: 10
-            },
-            {
-                type: 'text',
-                question: 'Siapa penemu lampu pijar?',
-                answer: 'Thomas Edison',
-                point: 10
-            },
-            {
-                type: 'multiple',
-                question: 'Apa bahasa resmi di Jepang?',
-                options: ['Jepang', 'Jawa', 'Korea', 'Mandarin'],
-                answer: 'Jepang',
-                point: 10
-            },
-            {
-                type: 'text',
-                question: 'Apa simbol kimia untuk emas?',
-                answer: 'Au',
-                point: 10
-            },
-            {
-                type: 'multiple',
-                question: 'Siapa penulis "Laskar Pelangi"?',
-                options: ['Andrea Hirata', 'Pramoedya Ananta Toer', 'Tere Liye', 'Habiburrahman El Shirazy'],
-                answer: 'Andrea Hirata',
-                point: 10
-            },
-            {
-                type: 'text',
-                question: 'Berapa luas wilayah Indonesia (dalam juta km²)?',
-                answer: '1.9',
-                point: 10
-            },
-            {
-                type: 'multiple',
-                question: 'Apa mata uang Korea Selatan?',
-                options: ['Won', 'Yen', 'Dollar', 'Rupiah'],
-                answer: 'Won',
-                point: 10
-            },
-            {
-                type: 'text',
-                question: 'Siapa presiden pertama Indonesia?',
-                answer: 'Soekarno',
-                point: 10
-            }
-        ];
+    // Element References
+    const homePage = document.getElementById('home-page');
+    const startButton = document.getElementById('start-button');
+    const playerForm = document.getElementById('player-form');
+    const form = document.getElementById('form');
+    const quizPage = document.getElementById('quiz-page');
+    const questionContainer = document.getElementById('question-container');
+    const optionsContainer = document.getElementById('options-container');
+    const prevButton = document.getElementById('prev-button');
+    const nextButton = document.getElementById('next-button');
+    const timerElement = document.getElementById('timer');
+    const progressElement = document.getElementById('progress');
+    const statusElement = document.getElementById('status');
+    const resultPage = document.getElementById('result-page');
+    const resultName = document.getElementById('result-name');
+    const resultNim = document.getElementById('result-nim');
+    const resultScore = document.getElementById('result-score');
+    const resultAverage = document.getElementById('result-average');
+    const extraInfo = document.getElementById('extra-info');
+    const restartButton = document.getElementById('restart-button');
 
-        // Total Points
-        const MAX_TOTAL_POINTS = 150;
+    // Data Pemain
+    let player = {
+      name: '',
+      nim: ''
+    };
 
-        // DOM Elements
-        const home = document.getElementById('home');
-        const startBtn = document.getElementById('startBtn');
+    // Event Listeners
+    startButton.addEventListener('click', () => {
+      homePage.classList.add('hidden');
+      playerForm.classList.remove('hidden');
+    });
 
-        const playerData = document.getElementById('player-data');
-        const playerForm = document.getElementById('playerForm');
-        const nameInput = document.getElementById('name');
-        const nimInput = document.getElementById('nim');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      player.name = document.getElementById('name').value.trim();
+      player.nim = document.getElementById('nim').value.trim();
+      if (player.name && player.nim) {
+        playerForm.classList.add('hidden');
+        quizPage.classList.remove('hidden');
+        loadQuestion();
+        startTimer();
+        updateProgress();
+        updateStatus();
+      } else {
+        alert("Harap masukkan semua data.");
+      }
+    });
 
-        const quizPage = document.getElementById('quiz-page');
-        const questionStatus = document.getElementById('question-status');
-        const timerElement = document.getElementById('timer');
-        const questionElement = document.getElementById('question');
-        const optionsElement = document.getElementById('options');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const completedElement = document.getElementById('completed');
-        const totalQuestionsElement = document.getElementById('total-questions');
-        const currentScoreElement = document.getElementById('current-score');
-        const maxScoreElement = document.getElementById('max-score');
+    prevButton.addEventListener('click', () => {
+      saveAnswer();
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        loadQuestion();
+        resetTimer();
+        updateProgress();
+      }
+    });
 
-        const resultPage = document.getElementById('result-page');
-        const resultName = document.getElementById('result-name');
-        const resultNim = document.getElementById('result-nim');
-        const resultScore = document.getElementById('result-score');
-        const restartBtn = document.getElementById('restartBtn');
+    nextButton.addEventListener('click', () => {
+      saveAnswer();
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        loadQuestion();
+        resetTimer();
+        updateProgress();
+      } else {
+        endQuiz();
+      }
+    });
 
-        // Quiz State
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let userAnswers = new Array(questions.length).fill(null);
-        let timer;
-        let timeLeft = 30;
+    restartButton.addEventListener('click', () => {
+      // Reset state
+      currentQuestion = 0;
+      score = 0;
+      answers = [];
+      quizPage.classList.add('hidden');
+      resultPage.classList.add('hidden');
+      homePage.classList.remove('hidden');
+    });
 
-        // Player Info
-        let player = {
-            name: '',
-            nim: ''
-        };
+    // Functions
+    function loadQuestion() {
+      const data = quizData[currentQuestion];
+      questionContainer.innerHTML = `<h3 class="text-xl font-semibold mb-2">Soal ${currentQuestion + 1}: ${data.question}</h3>`;
+      optionsContainer.innerHTML = '';
 
-        // Initialize Quiz
-        startBtn.addEventListener('click', () => {
-            home.classList.add('hidden');
-            playerData.classList.remove('hidden');
+      if (data.type === 'multiple') {
+        data.options.forEach(option => {
+          const optionElement = document.createElement('div');
+          optionElement.classList.add('mb-2');
+          optionElement.innerHTML = `
+            <label class="flex items-center">
+              <input type="radio" name="option" value="${option}" class="mr-2">
+              ${option}
+            </label>
+          `;
+          optionsContainer.appendChild(optionElement);
         });
+      } else if (data.type === 'fill') {
+        optionsContainer.innerHTML = `<input type="text" id="fill-answer" class="mt-1 p-2 border rounded w-full" placeholder="Jawaban Anda">`;
+      }
 
-        // Handle Player Data Form Submission
-        playerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            player.name = nameInput.value.trim();
-            player.nim = nimInput.value.trim();
-
-            if (player.name === '' || player.nim === '') {
-                alert('Silakan isi semua field.');
-                return;
+      // Load previous answer if exists
+      if (answers[currentQuestion] !== undefined) {
+        if (data.type === 'multiple') {
+          const radios = document.getElementsByName('option');
+          radios.forEach(radio => {
+            if (radio.value === answers[currentQuestion]) {
+              radio.checked = true;
             }
+          });
+        } else if (data.type === 'fill') {
+          document.getElementById('fill-answer').value = answers[currentQuestion];
+        }
+      }
+    }
 
-            playerData.classList.add('hidden');
-            quizPage.classList.remove('hidden');
-            startQuiz();
-        });
+    function saveAnswer() {
+      const data = quizData[currentQuestion];
+      let answer;
+      if (data.type === 'multiple') {
+        const selected = document.querySelector('input[name="option"]:checked');
+        answer = selected ? selected.value : '';
+      } else if (data.type === 'fill') {
+        answer = document.getElementById('fill-answer').value.trim();
+      }
+      answers[currentQuestion] = answer;
+      updateStatus();
+    }
 
-        // Start Quiz
-        function startQuiz() {
-            totalQuestionsElement.textContent = questions.length;
-            maxScoreElement.textContent = calculateMaxScore();
+    function startTimer() {
+      timeLeft = 30;
+      timerElement.textContent = `${timeLeft}s`;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = `${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          saveAnswer();
+          if (currentQuestion < quizData.length - 1) {
+            currentQuestion++;
             loadQuestion();
-            updateStatus();
-            updateCompleted();
-            updateScoreDisplay();
+            resetTimer();
+            updateProgress();
+          } else {
+            endQuiz();
+          }
         }
+      }, 1000);
+    }
 
-        // Calculate Maximum Possible Score
-        function calculateMaxScore() {
-            return questions.reduce((acc, question) => acc + question.point, 0);
-        }
+    function resetTimer() {
+      clearInterval(timer);
+      startTimer();
+    }
 
-        // Load Current Question
-        function loadQuestion() {
-            clearInterval(timer);
-            timeLeft = 30;
-            timerElement.textContent = ${timeLeft}s;
-            timer = setInterval(countdown, 1000);
+    function updateProgress() {
+      progressElement.textContent = `Soal ${currentQuestion + 1} / ${quizData.length}`;
+    }
 
-            const q = questions[currentQuestionIndex];
-            questionStatus.textContent = Soal ${currentQuestionIndex + 1} dari ${questions.length};
-            questionElement.textContent = q.question;
-            optionsElement.innerHTML = '';
+    function updateStatus() {
+      const completed = answers.filter(ans => ans !== undefined && ans !== '').length;
+      statusElement.textContent = `Soal sudah dikerjakan: ${completed} / ${quizData.length}`;
+    }
 
-            if (q.type === 'multiple') {
-                q.options.forEach(option => {
-                    const label = document.createElement('label');
-                    label.classList.add('block', 'p-2', 'border', 'rounded-lg', 'hover:bg-gray-100', 'cursor-pointer');
+    function endQuiz() {
+      clearInterval(timer);
+      saveAnswer();
+      calculateScore();
+      quizPage.classList.add('hidden');
+      resultPage.classList.remove('hidden');
+    }
 
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = 'option';
-                    input.value = option;
-                    input.classList.add('mr-2');
-
-                    if (userAnswers[currentQuestionIndex] === option) {
-                        input.checked = true;
-                    }
-
-                    label.appendChild(input);
-                    label.appendChild(document.createTextNode(option));
-                    optionsElement.appendChild(label);
-                });
-            } else if (q.type === 'text') {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.id = 'text-answer';
-                input.classList.add('w-full', 'px-3', 'py-2', 'border', 'rounded-lg');
-                input.value = userAnswers[currentQuestionIndex] || '';
-                optionsElement.appendChild(input);
+    function calculateScore() {
+      score = 0;
+      quizData.forEach((item, index) => {
+        if (answers[index]) {
+          if (item.type === 'multiple') {
+            if (answers[index] === item.answer) {
+              score += item.points;
             }
-
-            // Update Navigation Buttons
-            prevBtn.disabled = currentQuestionIndex === 0;
-            nextBtn.textContent = currentQuestionIndex === questions.length - 1 ? 'Selesai' : 'Next';
-        }
-
-        // Countdown Timer
-        function countdown() {
-            timeLeft--;
-            timerElement.textContent = ${timeLeft}s;
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                saveAnswer();
-                autoNext();
+          } else if (item.type === 'fill') {
+            if (answers[index].toLowerCase() === item.answer.toLowerCase()) {
+              score += item.points;
             }
+          }
         }
+      });
 
-        // Save User Answer
-        function saveAnswer() {
-            const q = questions[currentQuestionIndex];
-            let answer;
-            if (q.type === 'multiple') {
-                const selected = document.querySelector('input[name="option"]:checked');
-                answer = selected ? selected.value : '';
-            } else if (q.type === 'text') {
-                const textInput = document.getElementById('text-answer');
-                answer = textInput.value.trim();
-            }
-            userAnswers[currentQuestionIndex] = answer;
-        }
+      // Simulasi Rata-rata Nilai dari 3 Asprak
+      const asprakScores = generateAsprakScores(score);
+      const averageScore = (asprakScores.reduce((a, b) => a + b, 0) / asprakScores.length).toFixed(2);
 
-        // Handle Next Button Click
-        nextBtn.addEventListener('click', () => {
-            saveAnswer();
-            clearInterval(timer);
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-                updateStatus();
-                updateCompleted();
-                updateScoreDisplay();
-            } else {
-                finishQuiz();
-            }
-        });
+      // Menampilkan Hasil
+      resultName.textContent = player.name;
+      resultNim.textContent = player.nim;
+      resultScore.textContent = score;
 
-        // Handle Previous Button Click
-        prevBtn.addEventListener('click', () => {
-            saveAnswer();
-            clearInterval(timer);
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                loadQuestion();
-                updateStatus();
-                updateCompleted();
-                updateScoreDisplay();
-            }
-        });
+      // Menentukan apakah poin melebihi 100
+      if (score > 100) {
+        extraInfo.classList.remove('hidden');
+      }
 
-        // Auto-Next Function
-        function autoNext() {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-                updateStatus();
-                updateCompleted();
-                updateScoreDisplay();
-            } else {
-                finishQuiz();
-            }
-        }
+      resultAverage.textContent = averageScore;
+    }
 
-        // Update Status (Placeholder for additional status updates)
-        function updateStatus() {
-            // Additional status updates can be implemented here if needed
-        }
-
-        // Update Completed Questions Count
-        function updateCompleted() {
-            const completed = userAnswers.filter(ans => ans !== null && ans !== '').length;
-            completedElement.textContent = completed;
-        }
-
-        // Calculate and Update Score Display
-        function updateScoreDisplay() {
-            score = 0;
-            questions.forEach((q, index) => {
-                if (userAnswers[index] !== null && userAnswers[index] !== '') {
-                    if (q.type === 'multiple') {
-                        if (userAnswers[index] === q.answer) {
-                            score += q.point;
-                        }
-                    } else if (q.type === 'text') {
-                        if (userAnswers[index].toLowerCase() === q.answer.toLowerCase()) {
-                            score += q.point;
-                        }
-                    }
-                }
-            });
-            currentScoreElement.textContent = score;
-        }
-
-        // Finish Quiz
-        function finishQuiz() {
-            clearInterval(timer);
-            quizPage.classList.add('hidden');
-            calculateFinalScore();
-            displayResult();
-        }
-
-        // Calculate Final Score (Ensuring it does not exceed MAX_TOTAL_POINTS)
-        function calculateFinalScore() {
-            score = 0;
-            questions.forEach((q, index) => {
-                if (userAnswers[index] !== null && userAnswers[index] !== '') {
-                    if (q.type === 'multiple') {
-                        if (userAnswers[index] === q.answer) {
-                            score += q.point;
-                        }
-                    } else if (q.type === 'text') {
-                        if (userAnswers[index].toLowerCase() === q.answer.toLowerCase()) {
-                            score += q.point;
-                        }
-                    }
-                }
-            });
-
-            // Ensure score does not exceed MAX_TOTAL_POINTS
-            if (score > MAX_TOTAL_POINTS) {
-                score = MAX_TOTAL_POINTS;
-            }
-        }
-
-        // Display Result
-        function displayResult() {
-            resultName.textContent = player.name;
-            resultNim.textContent = player.nim;
-            resultScore.textContent = score;
-
-            resultPage.classList.remove('hidden');
-
-            // Optionally, you can store the result in localStorage or send it to a server
-            // For example:
-            // const quizResult = { name: player.name, nim: player.nim, score: score };
-            // localStorage.setItem('quizResult', JSON.stringify(quizResult));
-        }
-
-        // Restart Quiz
-        restartBtn.addEventListener('click', () => {
-            // Reset State
-            currentQuestionIndex = 0;
-            score = 0;
-            userAnswers = new Array(questions.length).fill(null);
-            player = { name: '', nim: '' };
-
-            // Reset Pages
-            resultPage.classList.add('hidden');
-            home.classList.remove('hidden');
-
-            // Reset Forms and Displays
-            playerForm.reset();
-            currentScoreElement.textContent = '0';
-            completedElement.textContent = '0';
-        });
-
-        // Optional: Update score in real-time as user answers
-        // This can be triggered on each answer save
-    </script>
+    function generateAsprakScores(totalScore) {
+      // Menghasilkan tiga skor acak dari asprak yang berkisar antara totalScore -5 hingga totalScore +5
+      // Pastikan skor tetap dalam rentang 0 hingga 150
+      let scores = [];
+      for (let i = 0; i < 3; i++) {
+        let variation = Math.floor(Math.random() * 11) - 5; // -5 to +5
+        let asprakScore = totalScore + variation;
+        asprakScore = Math.max(0, Math.min(asprakScore, 150));
+        scores.push(asprakScore);
+      }
+      return scores;
+    }
+  </script>
 </body>
 </html>
