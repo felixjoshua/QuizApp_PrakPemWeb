@@ -9,26 +9,49 @@
 </head>
 <body class="bg-gray-100">
 
-  <!-- Home/Landing Page -->
+  <!-- Home/Landing Page/Dashboard -->
   <div id="home-page" class="flex flex-col items-center justify-center h-screen">
     <h1 class="text-4xl font-bold mb-6">Selamat Datang di Aplikasi Quiz</h1>
     <button id="start-button" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Mulai Quiz</button>
   </div>
 
-  <!-- Form Data Pemain -->
-  <div id="player-form" class="hidden flex flex-col items-center justify-center h-screen">
-    <h2 class="text-2xl font-semibold mb-4">Masukkan Data Pemain</h2>
-    <form id="form" class="bg-white p-6 rounded-lg shadow-md">
-      <div class="mb-4">
-        <label class="block text-gray-700">Nama:</label>
-        <input type="text" id="name" class="mt-1 p-2 border rounded w-64" required>
-      </div>
-      <div class="mb-4">
-        <label class="block text-gray-700">NIM:</label>
-        <input type="text" id="nim" class="mt-1 p-2 border rounded w-64" required>
-      </div>
-      <button type="submit" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600">Mulai Quiz</button>
-    </form>
+  <!-- Landing Page -->
+  <div id="landing-page" class="hidden flex flex-col items-center justify-center h-screen p-4">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-lg text-center">
+      <h2 class="text-2xl font-semibold mb-4">Instruksi Quiz</h2>
+      <p class="mb-6">
+        Selamat datang! Silakan ikuti instruksi berikut sebelum memulai quiz:
+      </p>
+      <ul class="list-disc list-inside text-left mb-6">
+        <li>Quiz terdiri dari 10 pertanyaan dengan berbagai tipe soal.</li>
+        <li>Setiap pertanyaan memiliki waktu 30 detik.</li>
+        <li>Jawaban akan dinilai secara otomatis.</li>
+        <li>Pastikan Anda telah memasukkan data diri dengan benar sebelum memulai.</li>
+      </ul>
+      <button id="to-dashboard-button" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
+        Lanjut ke Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Dashboard (Form Data Pemain) -->
+  <div id="dashboard" class="hidden flex flex-col items-center justify-center h-screen p-4">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
+      <h2 class="text-2xl font-semibold mb-6 text-center">Masukkan Data Pemain</h2>
+      <form id="form" class="space-y-4">
+        <div>
+          <label for="name" class="block text-gray-700">Nama:</label>
+          <input type="text" id="name" class="mt-1 p-2 border rounded w-full" required>
+        </div>
+        <div>
+          <label for="nim" class="block text-gray-700">NIM:</label>
+          <input type="text" id="nim" class="mt-1 p-2 border rounded w-full" required>
+        </div>
+        <button type="submit" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          Mulai Quiz
+        </button>
+      </form>
+    </div>
   </div>
 
   <!-- Halaman Quiz -->
@@ -62,8 +85,9 @@
         <p><strong>Nama:</strong> <span id="result-name"></span></p>
         <p><strong>NIM:</strong> <span id="result-nim"></span></p>
         <p><strong>Nilai Total:</strong> <span id="result-score"></span></p>
-        <p><strong>Nilai Rata-rata (Asprak):</strong> <span id="result-average"></span></p>
-        <p id="extra-info" class="mt-2 text-sm text-gray-700 hidden">Anda dapat menyimpan poin lebih dari 100 untuk memperbaiki nilai di modul lain.</p>
+        <p id="extra-info" class="mt-2 text-sm text-gray-700 hidden">
+          Anda dapat menyimpan poin lebih dari 100 untuk memperbaiki nilai di modul lain.
+        </p>
       </div>
       <!-- Review Jawaban -->
       <div id="review-section" class="mt-6">
@@ -175,7 +199,9 @@
     // Element References
     const homePage = document.getElementById('home-page');
     const startButton = document.getElementById('start-button');
-    const playerForm = document.getElementById('player-form');
+    const landingPage = document.getElementById('landing-page');
+    const toDashboardButton = document.getElementById('to-dashboard-button');
+    const dashboard = document.getElementById('dashboard');
     const form = document.getElementById('form');
     const quizPage = document.getElementById('quiz-page');
     const questionContainer = document.getElementById('question-container');
@@ -189,10 +215,9 @@
     const resultName = document.getElementById('result-name');
     const resultNim = document.getElementById('result-nim');
     const resultScore = document.getElementById('result-score');
-    const resultAverage = document.getElementById('result-average');
     const extraInfo = document.getElementById('extra-info');
-    const restartButton = document.getElementById('restart-button');
     const reviewTableBody = document.getElementById('review-table-body');
+    const restartButton = document.getElementById('restart-button');
 
     // Data Pemain
     let player = {
@@ -203,7 +228,12 @@
     // Event Listeners
     startButton.addEventListener('click', () => {
       homePage.classList.add('hidden');
-      playerForm.classList.remove('hidden');
+      landingPage.classList.remove('hidden');
+    });
+
+    toDashboardButton.addEventListener('click', () => {
+      landingPage.classList.add('hidden');
+      dashboard.classList.remove('hidden');
     });
 
     form.addEventListener('submit', (e) => {
@@ -211,7 +241,7 @@
       player.name = document.getElementById('name').value.trim();
       player.nim = document.getElementById('nim').value.trim();
       if (player.name && player.nim) {
-        playerForm.classList.add('hidden');
+        dashboard.classList.add('hidden');
         quizPage.classList.remove('hidden');
         loadQuestion();
         startTimer();
@@ -288,21 +318,21 @@
       }
 
       // Load previous answer if exists
-      if (state.answer !== '') {
+      if (quizState[currentQuestion].answer !== '') {
         if (data.type === 'multiple') {
           const radios = document.getElementsByName('option');
           radios.forEach(radio => {
-            if (radio.value === state.answer) {
+            if (radio.value === quizState[currentQuestion].answer) {
               radio.checked = true;
             }
           });
         } else if (data.type === 'fill') {
-          document.getElementById('fill-answer').value = state.answer;
+          document.getElementById('fill-answer').value = quizState[currentQuestion].answer;
         }
       }
 
       // Update timer display
-      timerElement.textContent = `${state.timeLeft}s`;
+      timerElement.textContent = `${quizState[currentQuestion].timeLeft}s`;
 
       // Disable 'prev' button if current question is locked or first question
       if (currentQuestion === 0 || (currentQuestion > 0 && quizState[currentQuestion - 1].locked)) {
@@ -319,7 +349,7 @@
       }
 
       // Disable 'next' button if current question is locked
-      if (state.locked) {
+      if (quizState[currentQuestion].locked) {
         nextButton.disabled = true;
         nextButton.classList.add('opacity-50', 'cursor-not-allowed');
       } else {
@@ -437,10 +467,6 @@
         reviewTableBody.appendChild(row);
       });
 
-      // Simulasi Rata-rata Nilai dari 3 Asprak
-      const asprakScores = generateAsprakScores(score);
-      const averageScore = (asprakScores.reduce((a, b) => a + b, 0) / asprakScores.length).toFixed(2);
-
       // Menampilkan Hasil
       resultName.textContent = player.name;
       resultNim.textContent = player.nim;
@@ -452,22 +478,8 @@
       } else {
         extraInfo.classList.add('hidden');
       }
-
-      resultAverage.textContent = averageScore;
     }
 
-    function generateAsprakScores(totalScore) {
-      // Menghasilkan tiga skor acak dari asprak yang berkisar antara totalScore -5 hingga totalScore +5
-      // Pastikan skor tetap dalam rentang 0 hingga 150
-      let scores = [];
-      for (let i = 0; i < 3; i++) {
-        let variation = Math.floor(Math.random() * 11) - 5; // -5 to +5
-        let asprakScore = totalScore + variation;
-        asprakScore = Math.max(0, Math.min(asprakScore, 150));
-        scores.push(asprakScore);
-      }
-      return scores;
-    }
   </script>
 </body>
 </html>
