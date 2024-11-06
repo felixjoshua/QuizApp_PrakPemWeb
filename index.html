@@ -13,13 +13,26 @@
       id="home-page"
       class="flex flex-col items-center justify-center h-screen"
     >
-      <h1 class="text-4xl font-bold mb-6">Selamat Datang di Aplikasi Quiz</h1>
+      <h1 class="text-4xl font-bold mb-16 text-center">
+        Selamat Datang di Aplikasi Quiz
+      </h1>
       <button
         id="start-button"
         class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
       >
         Mulai Quiz
       </button>
+
+      <b class="mt-28">Creator:</b>
+      <p>Felix Joshua Paulus (NIM: 105222032)</p>
+      <p>Benony Gabriel (NIM: 105222002)</p>
+
+      <b class="mt-6">GitHub:</b>
+      <a
+        href="https://github.com/felixjoshua/QuizApp_PrakPemWeb"
+        class="text-blue-400 hover:text-blue-700"
+        >Source</a
+      >
     </div>
 
     <!-- Landing Page -->
@@ -28,18 +41,16 @@
       class="hidden flex flex-col items-center justify-center h-screen p-4"
     >
       <div class="bg-white p-8 rounded-lg shadow-md max-w-lg text-center">
-        <h2 class="text-2xl font-semibold mb-4">Instruksi Quiz</h2>
+        <h2 class="text-2xl font-semibold mb-4">Ketentuan Quiz</h2>
         <p class="mb-6">
           Selamat datang! Silakan ikuti instruksi berikut sebelum memulai quiz:
         </p>
         <ul class="list-disc list-inside text-left mb-6">
-          <li>Quiz terdiri dari 10 pertanyaan dengan berbagai tipe soal.</li>
+          <li>Quiz terdiri dari 10 pertanyaan (Pilihan ganda dan Isian)</li>
           <li>Setiap pertanyaan memiliki waktu 30 detik.</li>
-          <li>Jawaban akan dinilai secara otomatis.</li>
-          <li>
-            Pastikan Anda telah memasukkan data diri dengan benar sebelum
-            memulai.
-          </li>
+          <li>Nilai maksimal yang bisa didapat adalah 100.</li>
+
+          <li>Pastikan data diri Anda sudah benar sebelum dimulai.</li>
         </ul>
         <button
           id="to-dashboard-button"
@@ -57,7 +68,7 @@
     >
       <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
         <h2 class="text-2xl font-semibold mb-6 text-center">
-          Masukkan Data Pemain
+          Masukkan Data Anda
         </h2>
         <form id="form" class="space-y-4">
           <div>

@@ -1,72 +1,73 @@
 // Data Quiz
 const quizData = [
   {
-    question: "Apa ibu kota Indonesia?",
+    question: "Dimana letak ibu kota Indonesia yang baru?",
     type: "multiple",
-    options: ["Jakarta", "Bandung", "Surabaya", "Medan"],
-    answer: "Jakarta",
+    options: ["Kalimantan Timur", "Jakarta", "Jawa Barat", "Medan"],
+    answer: "Kalimantan Timur",
     points: 10,
   },
   {
-    question: "2 + 2 = ?",
+    question: "Berapa hasil dari 2 + 2 = ?",
     type: "fill",
     answer: "4",
-    points: 5,
+    points: 10,
   },
   {
-    question: "Siapa penemu lampu pijar?",
+    question: "Siapa Presiden RI yang ke-8?",
     type: "multiple",
     options: [
-      "Thomas Edison",
-      "Albert Einstein",
-      "Isaac Newton",
-      "Nikola Tesla",
+      "Joko Widodo",
+      "Prabowo Subianto",
+      "Megawati Soekarno Putri",
+      "Ir. Soekarno",
     ],
-    answer: "Thomas Edison",
+    answer: "Prabowo Subianto",
     points: 10,
   },
   {
-    question: "Apa singkatan dari HTML?",
+    question: "Berapa jumlah provinsi di Indonesia pada tahun 2024",
     type: "fill",
-    answer: "HyperText Markup Language",
-    points: 5,
-  },
-  {
-    question: "Berapakah luas Indonesia?",
-    type: "fill",
-    answer: "1.904.569 km²",
+    answer: "38",
     points: 10,
   },
   {
-    question: "Manakah yang merupakan bahasa pemrograman?",
+    question: "Tahun berapa Indonesia Merdeka",
+    type: "fill",
+    answer: "1945",
+    points: 10,
+  },
+  {
+    question: "Ibu kota provinsi Papua",
     type: "multiple",
-    options: ["HTML", "CSS", "JavaScript", "HTTP"],
-    answer: "JavaScript",
+    options: ["Biak", "Timika", "Jayapura", "Asmat"],
+    answer: "Jayapura",
     points: 10,
   },
   {
-    question: "Apa singkatan dari CSS?",
+    question: "Apa kepanjangan dari PKI?",
     type: "fill",
-    answer: "Cascading Style Sheets",
-    points: 5,
+    answer: "Partai Komunis Indonesia",
+    points: 10,
   },
   {
-    question: "Manakah yang bukan merupakan framework JavaScript?",
+    question: "Apa julukan untuk kota Bogor",
     type: "multiple",
-    options: ["React", "Angular", "Laravel", "Vue"],
-    answer: "Laravel",
+    options: ["Kota Panas", "Kota Dingin", "Kota Hujan", "Kota Puncak"],
+    answer: "Kota Hujan",
     points: 10,
   },
   {
-    question: "Berapakah nilai maksimal yang bisa didapatkan dalam quiz ini?",
+    question:
+      "Hari lahir pancasila diperingati di tanggal berapa? (tanggal dan bulan)",
     type: "fill",
-    answer: "150",
+    answer: "1 Juni",
     points: 10,
   },
   {
-    question: "Apa fungsi dari Git dalam pengembangan perangkat lunak?",
+    question: "Apa Kepanjangan dari BPUPKI",
     type: "fill",
-    answer: "Version Control",
+    answer: "Badan Penyelidik Usaha-usaha Persiapan Kemerdekaan Indonesia",
     points: 10,
   },
 ];
@@ -83,7 +84,7 @@ let currentQuestion = 0;
 let score = 0;
 let timer = null;
 
-// Element References
+// Referensoi element
 const homePage = document.getElementById("home-page");
 const startButton = document.getElementById("start-button");
 const landingPage = document.getElementById("landing-page");
@@ -106,7 +107,7 @@ const extraInfo = document.getElementById("extra-info");
 const reviewTableBody = document.getElementById("review-table-body");
 const restartButton = document.getElementById("restart-button");
 
-// Data Pemain
+// Data user
 let player = {
   name: "",
   nim: "",
@@ -181,7 +182,6 @@ restartButton.addEventListener("click", () => {
   homePage.classList.remove("hidden");
 });
 
-// Functions
 function loadQuestion() {
   const data = quizData[currentQuestion];
   const state = quizState[currentQuestion];
@@ -206,7 +206,6 @@ function loadQuestion() {
     optionsContainer.innerHTML = `<input type="text" id="fill-answer" class="mt-1 p-2 border rounded w-full" placeholder="Jawaban Anda">`;
   }
 
-  // Load previous answer if exists
   if (quizState[currentQuestion].answer !== "") {
     if (data.type === "multiple") {
       const radios = document.getElementsByName("option");
@@ -221,10 +220,9 @@ function loadQuestion() {
     }
   }
 
-  // Update timer display
+  // Update timer
   timerElement.textContent = `${quizState[currentQuestion].timeLeft}s`;
 
-  // Disable 'prev' button if current question is locked or first question
   if (
     currentQuestion === 0 ||
     (currentQuestion > 0 && quizState[currentQuestion - 1].locked)
@@ -241,7 +239,6 @@ function loadQuestion() {
     }
   }
 
-  // Disable 'next' button if current question is locked
   if (quizState[currentQuestion].locked) {
     nextButton.disabled = true;
     nextButton.classList.add("opacity-50", "cursor-not-allowed");
@@ -328,7 +325,7 @@ function endQuiz() {
 
 function calculateScore() {
   score = 0;
-  reviewTableBody.innerHTML = ""; // Clear previous review if any
+  reviewTableBody.innerHTML = "";
   quizData.forEach((item, index) => {
     const state = quizState[index];
     const userAnswer = state.answer !== "" ? state.answer : "Tidak Dijawab";
@@ -368,11 +365,4 @@ function calculateScore() {
   resultName.textContent = player.name;
   resultNim.textContent = player.nim;
   resultScore.textContent = score;
-
-  // // Menentukan apakah poin melebihi 100
-  // if (score > 100) {
-  //   extraInfo.classList.remove("hidden");
-  // } else {
-  //   extraInfo.classList.add("hidden");
-  // }
 }
